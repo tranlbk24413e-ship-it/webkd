@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <meta charset = 'utf-8'>
+        <title>Table Actions</title>
+        <style>
+            body {
+                font-family: 'Times New Roman', Times, serif;
+            }
+            .container {
+                width: 480px;
+                border: 1px solid gray;
+                padding: 5px;
+            }
+            table {
+                border-collapse: collapse;
+                width: 400px;
+            }
+            td {
+                border: 1px solid gray;
+                padding: 1px;
+                cursor: pointer;
+            }
+            .doDo {
+                background-color: red;
+                color: white;
+            }
+        </style>
+        <script>
+            // Đồng hồ giờ điện tử, lấy giờ hệ thống client, cập nhật mỗi giây
+            function capNhatDongHo() {
+                var now = new Date();
+                var h = now.getHours();
+                var m = now.getMinutes();
+                var s = now.getSeconds();
+
+                h = (h < 10 ? "0" + h : h);
+                m = (m < 10 ? "0" + m : m);
+                s = (s < 10 ? "0" + s : s);
+
+                document.getElementById("dongho").innerHTML = h + ":" + m + ":" + s;
+            }
+
+            // Click trái / phải vào dòng thông báo
+            function baoClickTrai() {
+                alert("Bạn vừa click chuột TRÁI");
+            }
+
+            function baoClickPhai(e) {
+                e.preventDefault(); // chặn menu chuột phải mặc định của trình duyệt
+                alert("Bạn vừa click chuột PHẢI");
+            }
+
+            // Nhấn vào 1 dòng trong table: tô đỏ, nhấn lại thì bỏ tô đỏ
+            function toggleDoDong(dong) {
+                dong.classList.toggle("doDo");
+            }
+
+            // Thêm 1 dòng mới vào cuối table
+            function themDong() {
+                var bang = document.getElementById("bangDuLieu").getElementsByTagName("tbody")[0];
+                var dong = bang.insertRow(0); // chèn lên đầu bảng, giống hình đề
+                var cell1 = dong.insertCell(0);
+                var cell2 = dong.insertCell(1);
+                cell1.innerHTML = "Thêm dòng mới ở đây";
+                cell2.innerHTML = "Thêm dòng mới ở đây";
+
+                dong.onclick = function () {
+                    toggleDoDong(dong);
+                };
+            }
+
+            // Xóa các dòng đang được tô đỏ
+            function xoaDong() {
+                var bang = document.getElementById("bangDuLieu").getElementsByTagName("tbody")[0];
+                var dongDoDo = bang.querySelectorAll("tr.doDo");
+
+                dongDoDo.forEach(function (dong) {
+                    bang.removeChild(dong);
+                });
+            }
+
+            // Chỉ hiện dòng đang tô đỏ, ẩn hết các dòng còn lại (nhấn lại thì hiện lại hết)
+            var dangChiHienDong = false;
+            function chiHienDong() {
+                var bang = document.getElementById("bangDuLieu").getElementsByTagName("tbody")[0];
+                var tatCaDong = bang.getElementsByTagName("tr");
+
+                dangChiHienDong = !dangChiHienDong;
+
+                for (var i = 0; i < tatCaDong.length; i++) {
+                    if (dangChiHienDong) {
+                        if (!tatCaDong[i].classList.contains("doDo")) {
+                            tatCaDong[i].style.display = "none";
+                        }
+                    } else {
+                        tatCaDong[i].style.display = "";
+                    }
+                }
+            }
+
+            // Chỉ hiện cột 1, ẩn cột 2 (nhấn lại thì hiện lại cột 2)
+            var dangChiHienCot = false;
+            function chiHienCot() {
+                var bang = document.getElementById("bangDuLieu");
+                var tatCaDong = bang.getElementsByTagName("tr");
+
+                dangChiHienCot = !dangChiHienCot;
+
+                for (var i = 0; i < tatCaDong.length; i++) {
+                    var cotThu2 = tatCaDong[i].cells[1];
+                    if (cotThu2) {
+                        cotThu2.style.display = dangChiHienCot ? "none" : "";
+                    }
+                }
+            }
+
+            // Mở trang mới
+            function moTrangMoi() {
+                window.open("https://tranduythanh.com", "_blank");
+            }
+        </script>
+    </head>
+    <body onload = "capNhatDongHo(); setInterval(capNhatDongHo, 1000);">
+      <div class = "container">
+        <div id = "dongho"></div>
+
+        <p onclick = "baoClickTrai();" oncontextmenu = "baoClickPhai(event);">
+            Click chuột vào dòng này. Sẽ xuất hiện thông báo phím bấm của chuột
+        </p>
+
+        <table id = "bangDuLieu">
+            <tbody>
+                <tr onclick = "toggleDoDong(this);">
+                    <td>Thêm dòng mới ở đây</td>
+                    <td>Thêm dòng mới ở đây</td>
+                </tr>
+                <tr onclick = "toggleDoDong(this);">
+                    <td>Thêm dòng mới ở đây</td>
+                    <td>Thêm dòng mới ở đây</td>
+                </tr>
+                <tr onclick = "toggleDoDong(this);">
+                    <td>Thêm dòng mới ở đây</td>
+                    <td>Thêm dòng mới ở đây</td>
+                </tr>
+                <tr onclick = "toggleDoDong(this);">
+                    <td>Dòng 1 cột 1</td>
+                    <td>Dòng 1 cột 2</td>
+                </tr>
+                <tr onclick = "toggleDoDong(this);">
+                    <td>Dòng 2 cột 1</td>
+                    <td>Dòng 2 cột 2</td>
+                </tr>
+                <tr onclick = "toggleDoDong(this);">
+                    <td>Dòng 3 cột 1</td>
+                    <td>Dòng 3 cột 2</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/><br/>
+        <input type = "button" value = "Thêm vào" onclick = "themDong();">
+        <input type = "button" value = "Xoá" onclick = "xoaDong();">
+        <input type = "button" value = "Chỉ hiện dòng" onclick = "chiHienDong();">
+        <input type = "button" value = "Chỉ hiện cột" onclick = "chiHienCot();">
+        <input type = "button" value = "Mở một trang mới" onclick = "moTrangMoi();">
+      </div>
+    </body>
+</html>
