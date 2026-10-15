@@ -1,0 +1,271 @@
+<html>
+    <head>
+        <meta charset = 'utf-8'>
+        <title>Dang ky thanh vien</title>
+        <style>
+            body {
+                font-family: 'Times New Roman', Times, serif;
+            }
+            .container {
+                width: 650px;
+                border: 1px solid gray;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 26px;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-top: 10px;
+            }
+            #bangDanhSach th, #bangDanhSach td {
+                border: 1px solid black;
+                padding: 1px 2px;
+            }
+            #bangDanhSach th {
+                background-color: blue;
+                color: white;
+                font-weight: normal;
+                text-align: left;
+                white-space: nowrap;
+            }
+        </style>
+        <script>
+            // Sinh danh sách ngày (1-31), tháng (1-12), năm (1950 - hiện tại) cho các dropdown
+            function napNgayThangNam() {
+                var selNgay = document.getElementById("ngay");
+                var selThang = document.getElementById("thang");
+                var selNam = document.getElementById("nam");
+
+                // Ngày: 1 -> 31 (vòng lặp for)
+                for (var d = 1; d <= 31; d++) {
+                    var opt = document.createElement("option");
+                    opt.value = d;
+                    opt.text = (d < 10 ? "0" + d : d);
+                    selNgay.appendChild(opt);
+                }
+
+                // Tháng: 1 -> 12 (vòng lặp while)
+                var m = 1;
+                while (m <= 12) {
+                    var opt = document.createElement("option");
+                    opt.value = m;
+                    opt.text = m;
+                    selThang.appendChild(opt);
+                    m++;
+                }
+
+                // Năm: 1950 -> năm hiện tại (vòng lặp do...while)
+                var namHienTai = new Date().getFullYear();
+                var y = 1950;
+                do {
+                    var opt = document.createElement("option");
+                    opt.value = y;
+                    opt.text = y;
+                    if (y === 1970) {
+                        opt.selected = true;
+                    }
+                    selNam.appendChild(opt);
+                    y++;
+                } while (y <= namHienTai);
+            }
+
+            // Kiểm tra Email hợp lệ bằng regex đơn giản
+            function kiemTraEmail(email) {
+                var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return pattern.test(email);
+            }
+
+            function dangKy() {
+                var ten = document.getElementById("ten").value.trim();
+                var email = document.getElementById("email").value.trim();
+
+                if (ten === "") {
+                    alert("Tên không được bỏ trống!");
+                    document.getElementById("ten").focus();
+                    return;
+                }
+
+                if (!kiemTraEmail(email)) {
+                    alert("Email không hợp lệ!");
+                    document.getElementById("email").focus();
+                    return;
+                }
+
+                var ngay = document.getElementById("ngay").value;
+                var thang = document.getElementById("thang").value;
+                var nam = document.getElementById("nam").value;
+                var ngaySinh = (ngay < 10 ? "0" + ngay : ngay) + "/" + (thang < 10 ? "0" + thang : thang) + "/" + nam;
+
+                var gioiTinh = document.querySelector('input[name="gioitinh"]:checked').value;
+
+                // Lấy các sở thích đã chọn
+                var checkboxes = document.querySelectorAll('input[name="sothich"]:checked');
+                var soThich = [];
+                checkboxes.forEach(function (cb) {
+                    soThich.push(cb.value);
+                });
+
+                // Lấy màu yêu thích đã chọn
+                var mauChon = document.querySelector('input[name="mauyeuthich"]:checked');
+                var mauYeuThich = mauChon ? mauChon.value : "";
+
+                // Thêm 1 dòng mới vào bảng danh sách
+                var bang = document.getElementById("bangDanhSach").getElementsByTagName("tbody")[0];
+                var dong = bang.insertRow();
+
+                dong.insertCell(0).innerHTML = ten;
+                dong.insertCell(1).innerHTML = email;
+                dong.insertCell(2).innerHTML = gioiTinh;
+                dong.insertCell(3).innerHTML = ngaySinh;
+                dong.insertCell(4).innerHTML = soThich.join(", ");
+                dong.insertCell(5).innerHTML = mauYeuThich;
+
+                // Gắn sự kiện mouseover / mouseout cho dòng vừa thêm
+                dong.onmouseover = function () {
+                    this.style.backgroundColor = "yellow";
+                };
+                dong.onmouseout = function () {
+                    this.style.backgroundColor = "white";
+                };
+            }
+
+            function lamLai() {
+                document.getElementById("ten").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("ngay").selectedIndex = 0;
+                document.getElementById("thang").selectedIndex = 0;
+
+                // Đưa Năm về lại 1970
+                var selNam = document.getElementById("nam");
+                for (var i = 0; i < selNam.options.length; i++) {
+                    if (selNam.options[i].value == "1970") {
+                        selNam.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                document.getElementById("gtNam").checked = true;
+
+                var checkboxes = document.querySelectorAll('input[name="sothich"]');
+                checkboxes.forEach(function (cb) {
+                    cb.checked = true;
+                });
+
+                var mauRadio = document.querySelectorAll('input[name="mauyeuthich"]');
+                mauRadio.forEach(function (r) {
+                    r.checked = false;
+                });
+                document.getElementById("mauXanh").checked = true;
+
+                document.getElementById("ten").focus();
+            }
+        </script>
+    </head>
+    <body onload = "napNgayThangNam();">
+        <div class = "container">
+            <h1>Đăng ký thành viên</h1>
+            <hr border = 1/>
+
+            <table>
+                <tr>
+                    <td>Tên(*)</td>
+                    <td colspan = "3"><input type = "text" id = "ten" size = "40"></td>
+                </tr>
+                <tr>
+                    <td>Ngày sinh(*)</td>
+                    <td>
+                        Ngày: <select id = "ngay"></select>
+                        Tháng: <select id = "thang"></select>
+                        Năm: <select id = "nam"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Giới tính(*)</td>
+                    <td>
+                        <input type = "radio" name = "gioitinh" id = "gtNam" value = "Nam" checked>Nam
+                        <input type = "radio" name = "gioitinh" id = "gtNu" value = "Nữ">Nữ
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email(*)</td>
+                    <td colspan = "3"><input type = "text" id = "email" size = "40"></td>
+                </tr>
+            </table>
+            <br/>
+            <span>Sở thích của bạn:</span>
+            <div style="margin-left: 15px;">
+                <label><input type = "checkbox" name = "sothich" value = "Mua sắm" checked>Mua sắm</label><br/>
+                <label><input type = "checkbox" name = "sothich" value = "Du lịch" checked>Du lịch</label><br/>
+                <label><input type = "checkbox" name = "sothich" value = "Tán gẫu" checked>Tán gẫu</label><br/>
+                <label><input type = "checkbox" name = "sothich" value = "Đọc sách" checked>Đọc sách</label><br/>
+                <label><input type = "checkbox" name = "sothich" value = "Nghe nhạc" checked>Nghe nhạc</label><br/>
+            </div>
+            <span>Màu yêu thích của bạn:</span>
+            <div style="margin-left: 15px;">
+                <label>
+                    <input type = "radio" name = "mauyeuthich" id = "mauXanh" value = "Màu xanh da trời" checked>
+                    <span class = "mauChu" style = "background-color:blue;">Màu xanh da trời</span>
+                </label><br/>
+
+                <label>
+                    <input type = "radio" name = "mauyeuthich" value = "Màu đỏ">
+                    <span class = "mauChu" style = "background-color:red;">Màu đỏ</span>
+                </label><br/>
+
+                <label>
+                    <input type = "radio" name = "mauyeuthich" value = "Màu vàng">
+                    <span class = "mauChu" style = "background-color:yellow;">Màu vàng</span>
+                </label><br/>
+
+                <label>
+                    <input type = "radio" name = "mauyeuthich" value = "Màu xanh lá cây">
+                    <span class = "mauChu" style = "background-color:green;">Màu xanh lá cây</span>
+                </label><br/>
+
+                <label>
+                    <input type = "radio" name = "mauyeuthich" value = "Màu xanh tím">
+                    <span class = "mauChu" style = "background-color:violet;">Màu xanh tím</span>
+                </label><br/>
+            </div>
+
+            <br/>
+            <div style = "margin-left: 15px;">
+                <input type = "button" value = "Đăng ký" onclick = "dangKy();">
+                <input type = "button" value = "Tiếp" onclick = "lamLai();">
+            </div>
+
+            <table id = "bangDanhSach">
+                <thead>
+                    <tr>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Giới tính</th>
+                        <th>Năm sinh</th>
+                        <th>Sở thích</th>
+                        <th>Màu yêu thích</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onmouseover = "this.style.backgroundColor='yellow';" onmouseout = "this.style.backgroundColor='white';">
+                        <td>Nguyễn Văn Bình</td>
+                        <td>binh@gmail.com</td>
+                        <td>Nam</td>
+                        <td>02/02/1990</td>
+                        <td>đọc sách</td>
+                        <td>Màu vàng</td>
+                    </tr>
+                    <tr onmouseover = "this.style.backgroundColor='yellow';" onmouseout = "this.style.backgroundColor='white';">
+                        <td>Nguyễn Thị An</td>
+                        <td>nguyenthian@gmail.com</td>
+                        <td>Nữ</td>
+                        <td>01/01/1992</td>
+                        <td>Tán gẫu, đọc sách</td>
+                        <td>Màu đỏ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
